@@ -71,3 +71,32 @@ def postMultipleStocks():
     except Exception as e:
         print(f"Error processing POST multiple stocks request: {e}")
         return jsonify(ResponseMessages.err500)
+    
+@stockBP.put('')
+def putStock():
+    try:
+        requestData = request.get_json()
+        if not requestData:
+            return jsonify(ResponseMessages.err472)
+        
+        if 'name' not in requestData or 'cost' not in requestData:
+            return jsonify(ResponseMessages.err203)
+        print("Request Data for PUT Stock:", requestData)
+        return stockFunctions.putStock(requestData['name'], requestData['cost'])
+    except Exception as e:
+        print(f"Error processing PUT stock request: {e}")
+        return jsonify(ResponseMessages.err500)
+    
+@stockBP.delete('/<name>')
+def deleteStock(name):
+    try:
+        if not name:
+            return jsonify(ResponseMessages.err203)
+        deleteResult = stockFunctions.deleteStockByName(name)
+        print("Stock Data for deletion:", deleteResult)
+        # Extract deleted_count for response
+        result_data = {"deleted_count": deleteResult.deleted_count}
+        return jsonify(ResponseMessages.succ200, result_data)
+    except Exception as e:
+        print(f"Error processing DELETE stock request for {name}: {e}")
+        return jsonify(ResponseMessages.err500)
